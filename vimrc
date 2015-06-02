@@ -21,7 +21,7 @@ Plugin 'chriskempson/tomorrow-theme'
 " Plugin 'scrooloose/syntastic'
 Plugin 'bling/vim-airline'
 Plugin 'fatih/vim-go'
-Plugin 'editorconfig/editorconfig-vim'
+" Plugin 'editorconfig/editorconfig-vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'tacahiroy/ctrlp-funky'
 Plugin 'Chiel92/vim-autoformat'
@@ -29,11 +29,15 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'majutsushi/tagbar'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'rking/ag.vim'
-Plugin 'Yggdroot/indentLine'
+" Plugin 'Yggdroot/indentLine'
+Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'ekalinin/Dockerfile.vim'
 Plugin 'tpope/vim-endwise'
+Plugin 'marijnh/tern_for_vim'
+Plugin 'tpope/vim-bundler'
+Plugin 'tpope/vim-rake'
 
 call vundle#end()            " required
 
@@ -59,7 +63,7 @@ set noeol
 set binary
 
 " presentation settings
-colorscheme base16-default
+colorscheme base16-tomorrow
 set number              " precede each line with its line number
 set numberwidth=5       " number of culumns for line numbers
 set textwidth=0         " Do not wrap words (insert)
@@ -82,6 +86,11 @@ set smartcase       " do not ignore if search pattern has CAPS
 " backspace
 set backspace=indent,eol,start
 set noswapfile
+
+" ctags optimization
+set autochdir
+set tags+=./tags;
+
 " Plugin Settings
 " ==================
 
@@ -223,7 +232,7 @@ let g:tagbar_type_go = {
 """ ==========
 """ indentLine
 """ ==========
-let g:indentLine_color_term = 239
+" let g:indentLine_color_term = 239
 
 """ ==========
 """ vim-rails
