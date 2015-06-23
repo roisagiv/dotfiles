@@ -18,10 +18,8 @@ Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-rails'
 Plugin 'chriskempson/base16-vim'
 Plugin 'chriskempson/tomorrow-theme'
-" Plugin 'scrooloose/syntastic'
 Plugin 'bling/vim-airline'
 Plugin 'fatih/vim-go'
-" Plugin 'editorconfig/editorconfig-vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'tacahiroy/ctrlp-funky'
 Plugin 'Chiel92/vim-autoformat'
@@ -29,7 +27,6 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'majutsushi/tagbar'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'rking/ag.vim'
-" Plugin 'Yggdroot/indentLine'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'terryma/vim-multiple-cursors'
@@ -38,6 +35,10 @@ Plugin 'tpope/vim-endwise'
 Plugin 'marijnh/tern_for_vim'
 Plugin 'tpope/vim-bundler'
 Plugin 'tpope/vim-rake'
+Plugin 'terryma/vim-expand-region'
+Plugin 'sheerun/vim-polyglot'
+Plugin 'ervandew/supertab'
+
 
 call vundle#end()            " required
 
@@ -90,6 +91,10 @@ set noswapfile
 " ctags optimization
 set autochdir
 set tags+=./tags;
+
+set background=dark
+" Copy & Paste to system clipboard
+
 
 " Plugin Settings
 " ==================
