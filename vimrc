@@ -11,6 +11,8 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Chiel92/vim-autoformat'
 Plug 'mhinz/vim-signify'
+Plug 'tmux-plugins/vim-tmux-focus-events'
+
 
 " Syntax
 Plug 'sheerun/vim-polyglot'
@@ -50,6 +52,9 @@ Plug 'xolox/vim-misc'
 Plug 'xolox/vim-easytags'
 Plug 'majutsushi/tagbar'
 
+" Search
+Plug 'rking/ag.vim'
+
 call plug#end()
 
 " vi no compatible
@@ -68,7 +73,20 @@ set background=dark
 let base16colorspace=256
 let g:hybrid_custom_term_colors = 1
 " let g:hybrid_reduced_contrast = 1
-colorscheme hybrid
+" colorscheme hybrid
+" colorscheme base16-default
+
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+else
+  if !empty($BASE16_THEME)
+    let base16colorspace=256
+    exec "set background=" . $BASE16_VARIATION
+    "echom 'setting colorscheme to ' . $BASE16_THEME
+    colorscheme $BASE16_THEME
+  endif
+endif
 
 set t_Co=256
 let &t_Co=256 " 256 colors color schemes
@@ -179,10 +197,10 @@ let NERDTreeHighlightCursorline=1
 let g:ctrlp_working_path_mode = 'ra'
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 let g:ctrlp_custom_ignore = {
-    \ 'dir':  '_build$\|deps$\|\.git$\|\.hg$\|\.svn$\|log$\|_public$\|node_modules$\|bower_components$\|tmp$\|vendor/bundle$\|vendor/cache$\|coverage$\|vendor/mongodb$\|vendor/redis$',
+    \ 'dir':  '.*(_build$\|deps$\|\.git$\|\.hg$\|\.svn$\|log$\|_public$\|node_modules$\|bower_components$\|tmp$\|vendor/bundle$\|vendor/cache$\|coverage$\|vendor/mongodb$\|vendor/redis$)$',
     \ 'file': '\.swp$\|\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\',
     \ }
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+" let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 
 nnoremap <Leader>fu :CtrlPFunky<Cr>
 " narrow the list down with a word under cursor
@@ -241,7 +259,7 @@ set tags=./tags;,~/.vimtags
 " @see https://github.com/xolox/vim-easytags/issues/92
 let g:easytags_languages = {
 \   'javascript': {
-\     'cmd': working_folder . "/node_modules/jsctags/bin/jsctags",
+\     'cmd': "jsctags",
 \     'args': [],
 \     'fileoutput_opt': '-f',
 \     'stdout_opt': '-f-',
@@ -254,7 +272,7 @@ let g:easytags_events = ['BufReadPost', 'BufWritePost']
 let g:easytags_async = 1
 let g:easytags_dynamic_files = 2
 let g:easytags_resolve_links = 1
-let g:easytags_suppress_ctags_warning = 1
+" let g:easytags_suppress_ctags_warning = 1
 
 """"""
 " Tagbar
