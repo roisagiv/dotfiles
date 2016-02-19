@@ -7,12 +7,12 @@ Plug 'wincent/terminus'
 Plug 'jszakmeister/vim-togglecursor'
 Plug 'scrooloose/syntastic'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Chiel92/vim-autoformat'
 Plug 'mhinz/vim-signify'
 Plug 'tmux-plugins/vim-tmux-focus-events'
-
 
 " Syntax
 Plug 'sheerun/vim-polyglot'
@@ -26,6 +26,7 @@ Plug 'tacahiroy/ctrlp-funky'
 " Auto complete
 if has('nvim')
   Plug 'Shougo/deoplete.nvim'
+  " Plug 'Shougo/context_filetype.vim'
 else
   Plug 'Valloric/YouCompleteMe', { 'do': './install.py --tern-completer' }
 endif
@@ -40,7 +41,24 @@ Plug 'millermedeiros/vim-esformatter'
 Plug 'mxw/vim-jsx'
 Plug 'jelera/vim-javascript-syntax' " Improved JavaScript syntax.
 Plug 'othree/javascript-libraries-syntax.vim' " Syntax for JS libraries.
+Plug 'othree/jsdoc-syntax.vim'
+Plug 'othree/es.next.syntax.vim'
+Plug 'othree/yajs.vim'
 Plug 'mephux/vim-jsfmt'
+Plug 'editorconfig/editorconfig-vim'
+
+" CSS & Sass
+Plug 'cakebaker/scss-syntax.vim'
+Plug 'hail2u/vim-css3-syntax'
+" Plug 'othree/csscomplete.vim'
+
+" HTML
+Plug 'othree/html5.vim'
+Plug 'davidosomething/syntastic-hbstidy'
+
+" Handlebars
+Plug 'mustache/vim-mustache-handlebars'
+Plug 'joukevandermaas/vim-ember-hbs'
 
 " Themes & Colors
 Plug 'chriskempson/base16-vim'
@@ -55,10 +73,19 @@ Plug 'majutsushi/tagbar'
 " Search
 Plug 'rking/ag.vim'
 
+" devicons
+Plug 'ryanoasis/vim-devicons'
+
+" Buffers
+Plug 'jeetsukumaran/vim-buffergator'
+Plug 'qpkorr/vim-bufkill'
+
+
 call plug#end()
 
 " vi no compatible
 set nocompatible
+set lazyredraw
 
 " ==============================================================================
 " VARIABLES
@@ -98,11 +125,20 @@ syntax on " syntax highlighting on
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set history=1000 " How many lines of history to remember
 "set cf " enable error files and error jumping
-" set clipboard+=unnamed " turns out I do like sharing windows clipboard
 set ffs=unix,mac,dos " support all three, in this order
 "set viminfo+=! " make sure it can save viminfo
 set isk+=_,$,@,%,# " none of these should be word dividers, so make them not be
 set nosol " leave my cursor where it was
+set encoding=utf8
+set cursorline " Highlight current line
+
+if has('nvim')
+  " Use unnamed registers for clipboard
+  set clipboard+=unnamedplus
+else
+  " This allows you to share Vim's clipboard with OS X.
+  set clipboard=unnamed
+endif
 
 " swp file
 set backupdir=~/.vim/backup_files//
@@ -201,6 +237,8 @@ let g:ctrlp_custom_ignore = {
     \ 'file': '\.swp$\|\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\',
     \ }
 " let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+let g:ctrlp_use_caching = 0
 
 nnoremap <Leader>fu :CtrlPFunky<Cr>
 " narrow the list down with a word under cursor
@@ -213,12 +251,16 @@ let g:airline_left_sep = ''        " Remove arrow symbols.
 let g:airline_left_alt_sep = ''    " Remove arrow symbols.
 let g:airline_right_sep = ''       " Remove arrow symbols.
 let g:airline_right_alt_sep = ''   " Remove arrow symbols.
-let g:airline_theme = 'hybridline' " Use hybrid theme.
+" let g:airline_theme = 'hybridline' " Use hybrid theme.
+let g:airline_powerline_fonts = 1
+
+" Smarter tab line
+let g:airline#extensions#tabline#enabled = 1
 
 """""""""""""""
 " vim-jsfmt
 """""""""""""""
-let g:js_fmt_autosave = 1 " Enable auto fmt on save
+let g:js_fmt_autosave = 0 " Enable auto fmt on save
 
 """"""""""""""""""
 " AutoComplete
@@ -227,14 +269,21 @@ if has('nvim')
 
   " DEOPLETE
 
+  set omnifunc=syntaxcomplete#Complete
   let g:deoplete#enable_at_startup = 1
+
   if !exists('g:deoplete#omni#input_patterns')
     let g:deoplete#omni#input_patterns = {}
+    let g:deoplete#omni#input_patterns.html = '<[^>]*'
+    let g:deoplete#omni#input_patterns.css = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
+    let g:deoplete#omni#input_patterns.scss = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
   endif
   autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 
   let g:deoplete#enable_smart_case = 1
   let g:deoplete#auto_completion_start_length = 1  " Set minimum syntax keyword length.
+  let g:context_filetype#filetypes = get(g:, 'context_filetype#filetypes', {})
+  let g:context_filetype#same_filetypes = {'_': '_'}
 
   inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
   inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -249,11 +298,20 @@ if exists('g:plugs["tern_for_vim"]')
   autocmd FileType javascript setlocal omnifunc=tern#Complete
 endif
 
+" Autocomplete ids and classes in CSS
+autocmd FileType css,scss set iskeyword=@,48-57,_,-,?,!,192-255
+
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS noci
+autocmd FileType html,html.handlebars,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+
+" javascript
+let g:used_javascript_libs = 'jquery,chai,handlebars'
+
 """""""
 " ctags
 """""""
 " Where to look for tags files
-set tags=./tags;,~/.vimtags
+set tags=./tags;,tags;,~/.vimtags
 
 " Use jsctags for javascript files
 " @see https://github.com/xolox/vim-easytags/issues/92
@@ -268,13 +326,65 @@ let g:easytags_languages = {
 \}
 
 " Sensible defaults
-let g:easytags_events = ['BufReadPost', 'BufWritePost']
+" let g:easytags_events = ['BufReadPost', 'BufWritePost']
 let g:easytags_async = 1
-let g:easytags_dynamic_files = 2
+let g:easytags_dynamic_files = 1
 let g:easytags_resolve_links = 1
 " let g:easytags_suppress_ctags_warning = 1
 
-""""""
+""""""""
 " Tagbar
-"""""""
+""""""""
 nmap <F8> :TagbarToggle<CR>
+
+""""""""""""
+" Autoformat
+""""""""""""
+noremap <F3> :Autoformat<CR>
+
+""""""""
+" ag.vim
+""""""""
+let g:ag_working_path_mode="r"
+
+"""""""""""""
+" WebDevIcons
+"""""""""""""
+let g:WebDevIconsUnicodeGlyphDoubleWidth = 1
+let g:WebDevIconsNerdTreeGitPluginForceVAlign = 0
+let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
+
+"""""""""""""
+" vim-bufkill
+"""""""""""""
+map <Leader>bd :BD<CR>  " Fast close buffer (using vim buf-kill)
+
+"""""""""""
+" syntastic
+"""""""""""
+let g:syntastic_javascript_checkers=['jshint', 'eslint']
+let g:syntastic_html_tidy_exec = 'tidy'
+
+" Map some filetypes, e.g. turn off html checkers on handlebars (I'm using my
+" hbstidy instead of html tidy)
+let g:syntastic_filetype_map = {
+\   'html.handlebars': 'handlebars',
+\   'markdown.pandoc': 'markdown',
+\ }
+
+let g:syntastic_ignore_files = [
+\ '\m\.min\.js$',
+\ '\m\.min\.css$',
+\ ]
+
+let g:syntastic_handlebars_checkers  = ['handlebars', 'hbstidy']
+
+" Ignore handlebars stuff in tidy
+let g:syntastic_html_tidy_ignore_errors = [
+\   ' allowed in <head> elements',
+\   '{{',
+\ ]
+
+" Force filetype
+autocmd BufRead,BufNewFile .eslintrc setfiletype json
+autocmd BufRead,BufNewFile .jshintrc setfiletype json
