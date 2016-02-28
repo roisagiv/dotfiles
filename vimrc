@@ -5,19 +5,26 @@ Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'wincent/terminus'
 Plug 'jszakmeister/vim-togglecursor'
-Plug 'scrooloose/syntastic'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Chiel92/vim-autoformat'
+Plug 'ruanyl/vim-fixmyjs'
 Plug 'mhinz/vim-signify'
 Plug 'tmux-plugins/vim-tmux-focus-events'
 
 " Syntax
 Plug 'sheerun/vim-polyglot'
-Plug 'scrooloose/syntastic'
-Plug 'jiangmiao/auto-pairs' " insert or delete brackets, parens, quotes in pair
+
+if has('nvim')
+  Plug 'benekastah/neomake'
+  " Plug 'benjie/neomake-local-eslint.vim'
+else
+  Plug 'scrooloose/syntastic'
+endif
+
+Plug 'JarrodCTaylor/vim-reflection' " insert or delete brackets, parens, quotes in pair
 
 " ctrlp
 Plug 'ctrlpvim/ctrlp.vim'
@@ -33,28 +40,36 @@ endif
 
 " Rails plugins
 Plug 'tpope/vim-rails'
+Plug 'osyo-manga/vim-monster'
 
 " JS plugins
-Plug 'ternjs/tern_for_vim', { 'do': 'npm install' }
+Plug 'ternjs/tern_for_vim', { 'do': 'npm install --update' }
 Plug 'pangloss/vim-javascript'
+if has('nvim')
+  Plug 'neovim/node-host'
+  Plug 'bigfish/vim-js-context-coloring', { 'branch': 'neovim', 'do': 'npm install --update' }
+endif
 Plug 'millermedeiros/vim-esformatter'
 Plug 'mxw/vim-jsx'
-Plug 'jelera/vim-javascript-syntax' " Improved JavaScript syntax.
+" Plug 'jelera/vim-javascript-syntax' " Improved JavaScript syntax.
 Plug 'othree/javascript-libraries-syntax.vim' " Syntax for JS libraries.
 Plug 'othree/jsdoc-syntax.vim'
-Plug 'othree/es.next.syntax.vim'
-Plug 'othree/yajs.vim'
-Plug 'mephux/vim-jsfmt'
+" Plug 'othree/es.next.syntax.vim'
+" Plug 'othree/yajs.vim'
+" Plug 'marcelbeumer/javascript-syntax.vim'
+" Plug 'mephux/vim-jsfmt'
 Plug 'editorconfig/editorconfig-vim'
 
 " CSS & Sass
 Plug 'cakebaker/scss-syntax.vim'
 Plug 'hail2u/vim-css3-syntax'
-" Plug 'othree/csscomplete.vim'
+Plug 'othree/csscomplete.vim'
 
 " HTML
 Plug 'othree/html5.vim'
 Plug 'davidosomething/syntastic-hbstidy'
+Plug 'alvan/vim-closetag'
+Plug 'gregsexton/MatchTag'
 
 " Handlebars
 Plug 'mustache/vim-mustache-handlebars'
@@ -120,6 +135,11 @@ let &t_Co=256 " 256 colors color schemes
 
 syntax on " syntax highlighting on
 
+:command WQ wq
+:command Wq wq
+:command W w
+:command Q q<Paste>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -151,7 +171,7 @@ set copyindent
 set undolevels=1000
 
 " you have a fast terminal
-set ttyfast
+" set ttyfast
 " set ttyscroll=3
 
 set completeopt-=preview  " Do not show preview window for ins-completion.
@@ -178,7 +198,7 @@ set noerrorbells " don't make noise
 set list " we do what to show tabs, to ensure we get them out of my files
 " "set listchars=tab:>-,trail:-,eol:$ " show tabs and trailing whitespace
 set listchars=tab:»·,trail:·,precedes:«,extends:» " show tabs and trailing whitespace
- 
+
 " mostly does the right thing
 set smartindent
 
@@ -222,7 +242,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 let NERDTreeDirArrows   = 1
 let NERDTreeHijackNetrw = 0
 let NERDTreeShowFiles=1
-let NERDTreeShowHidden=0
+let NERDTreeShowHidden=1
 let NERDTreeMinimalUI = 1
 let NERDTreeHighlightCursorline=1
 
@@ -233,9 +253,9 @@ let NERDTreeHighlightCursorline=1
 let g:ctrlp_working_path_mode = 'ra'
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 let g:ctrlp_custom_ignore = {
-    \ 'dir':  '.*(_build$\|deps$\|\.git$\|\.hg$\|\.svn$\|log$\|_public$\|node_modules$\|bower_components$\|tmp$\|vendor/bundle$\|vendor/cache$\|coverage$\|vendor/mongodb$\|vendor/redis$)$',
-    \ 'file': '\.swp$\|\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\',
-    \ }
+      \ 'dir':  '.*(_build$\|deps$\|\.git$\|\.hg$\|\.svn$\|log$\|_public$\|node_modules$\|bower_components$\|tmp$\|vendor/bundle$\|vendor/cache$\|coverage$\|vendor/mongodb$\|vendor/redis$)$',
+      \ 'file': '\.swp$\|\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\',
+      \ }
 " let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 let g:ctrlp_use_caching = 0
@@ -262,6 +282,11 @@ let g:airline#extensions#tabline#enabled = 1
 """""""""""""""
 let g:js_fmt_autosave = 0 " Enable auto fmt on save
 
+""""""""""""""
+" vim-polyglot
+""""""""""""""
+let g:polyglot_disabled = ['css','javascript','html']
+
 """"""""""""""""""
 " AutoComplete
 """"""""""""""""""
@@ -272,18 +297,15 @@ if has('nvim')
   set omnifunc=syntaxcomplete#Complete
   let g:deoplete#enable_at_startup = 1
 
-  if !exists('g:deoplete#omni#input_patterns')
-    let g:deoplete#omni#input_patterns = {}
-    let g:deoplete#omni#input_patterns.html = '<[^>]*'
-    let g:deoplete#omni#input_patterns.css = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
-    let g:deoplete#omni#input_patterns.scss = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
-  endif
+  let g:deoplete#omni#input_patterns = {}
+  let g:deoplete#omni#input_patterns.html = '<[^>]*'
+  let g:deoplete#omni#input_patterns.css = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
+  let g:deoplete#omni#input_patterns.scss = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
+
   autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 
   let g:deoplete#enable_smart_case = 1
   let g:deoplete#auto_completion_start_length = 1  " Set minimum syntax keyword length.
-  let g:context_filetype#filetypes = get(g:, 'context_filetype#filetypes', {})
-  let g:context_filetype#same_filetypes = {'_': '_'}
 
   inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
   inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -306,6 +328,8 @@ autocmd FileType html,html.handlebars,markdown setlocal omnifunc=htmlcomplete#Co
 
 " javascript
 let g:used_javascript_libs = 'jquery,chai,handlebars'
+let g:js_context_colors_highlight_function_names=1
+let g:js_context_colors_colorize_comments = 1
 
 """""""
 " ctags
@@ -316,14 +340,14 @@ set tags=./tags;,tags;,~/.vimtags
 " Use jsctags for javascript files
 " @see https://github.com/xolox/vim-easytags/issues/92
 let g:easytags_languages = {
-\   'javascript': {
-\     'cmd': "jsctags",
-\     'args': [],
-\     'fileoutput_opt': '-f',
-\     'stdout_opt': '-f-',
-\     'recurse_flag': '-R'
-\   }
-\}
+      \   'javascript': {
+      \     'cmd': "jsctags",
+      \     'args': [],
+      \     'fileoutput_opt': '-f',
+      \     'stdout_opt': '-f-',
+      \     'recurse_flag': '-R'
+      \   }
+      \}
 
 " Sensible defaults
 " let g:easytags_events = ['BufReadPost', 'BufWritePost']
@@ -341,6 +365,11 @@ nmap <F8> :TagbarToggle<CR>
 " Autoformat
 """"""""""""
 noremap <F3> :Autoformat<CR>
+au filetype html.handlebars noremap <F3> :Autoformat html<CR><CR>
+" let g:formatdef_eslint = '"eslint-formatter"'
+" let g:formatters_javascript = ['eslint']
+let g:fixmyjs_engine = 'eslint'
+noremap <Leader><Leader>f :Fixmyjs<CR>
 
 """"""""
 " ag.vim
@@ -368,23 +397,57 @@ let g:syntastic_html_tidy_exec = 'tidy'
 " Map some filetypes, e.g. turn off html checkers on handlebars (I'm using my
 " hbstidy instead of html tidy)
 let g:syntastic_filetype_map = {
-\   'html.handlebars': 'handlebars',
-\   'markdown.pandoc': 'markdown',
-\ }
+      \   'html.handlebars': 'handlebars',
+      \   'markdown.pandoc': 'markdown',
+      \ }
 
 let g:syntastic_ignore_files = [
-\ '\m\.min\.js$',
-\ '\m\.min\.css$',
-\ ]
+      \ '\m\.min\.js$',
+      \ '\m\.min\.css$',
+      \ ]
 
 let g:syntastic_handlebars_checkers  = ['handlebars', 'hbstidy']
 
 " Ignore handlebars stuff in tidy
 let g:syntastic_html_tidy_ignore_errors = [
-\   ' allowed in <head> elements',
-\   '{{',
-\ ]
+      \   ' allowed in <head> elements',
+      \   '{{',
+      \ ]
+
+let g:neomake_warning_sign = {
+      \ 'text': '✹',
+      \ }
+
+let g:neomake_error_sign = {
+      \ 'text': '✖',
+      \ }
+
+if executable('eslint')
+  let g:neomake_javascript_enabled_makers = ['eslint']
+else
+  echoe 'No eslint executable detected. Install eslint for JavaScript syntax higlighting. `npm install -g eslint`'
+endif
+
+if exists('g:plugs["neomake"]')
+  if has('autocmd')
+    autocmd! BufWritePost * Neomake
+  endif
+endif
 
 " Force filetype
 autocmd BufRead,BufNewFile .eslintrc setfiletype json
 autocmd BufRead,BufNewFile .jshintrc setfiletype json
+autocmd BufRead,BufNewFile .jsbeautifyrc setfiletype json
+
+""""HTML
+" enable autoclose tag on xml files
+let g:closetag_filenames = "*.html,*.hbs"
+
+" enable mustache abbreviations
+let g:mustache_abbreviations = 1
+
+""""""""""""""""
+" ESFORMATTER
+""""""""""""""""
+nnoremap <silent> <leader>es :Esformatter<CR>
+vnoremap <silent> <leader>es :EsformatterVisual<CR>
