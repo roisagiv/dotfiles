@@ -15,7 +15,7 @@ Plug 'mhinz/vim-signify'
 Plug 'tmux-plugins/vim-tmux-focus-events'
 
 " Syntax
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
 
 if has('nvim')
   Plug 'benekastah/neomake'
@@ -39,8 +39,8 @@ else
 endif
 
 " Rails plugins
-Plug 'tpope/vim-rails'
-Plug 'osyo-manga/vim-monster'
+" Plug 'tpope/vim-rails'
+" Plug 'osyo-manga/vim-monster'
 
 " JS plugins
 Plug 'ternjs/tern_for_vim', { 'do': 'npm install --update' }
@@ -51,7 +51,7 @@ if has('nvim')
 endif
 Plug 'millermedeiros/vim-esformatter'
 Plug 'mxw/vim-jsx'
-" Plug 'jelera/vim-javascript-syntax' " Improved JavaScript syntax.
+Plug 'jelera/vim-javascript-syntax' " Improved JavaScript syntax.
 Plug 'othree/javascript-libraries-syntax.vim' " Syntax for JS libraries.
 Plug 'othree/jsdoc-syntax.vim'
 " Plug 'othree/es.next.syntax.vim'
@@ -138,12 +138,12 @@ syntax on " syntax highlighting on
 :command WQ wq
 :command Wq wq
 :command W w
-:command Q q<Paste>
+:command Q q
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set history=1000 " How many lines of history to remember
+set history=100 " How many lines of history to remember
 "set cf " enable error files and error jumping
 set ffs=unix,mac,dos " support all three, in this order
 "set viminfo+=! " make sure it can save viminfo
@@ -168,10 +168,10 @@ set undodir=~/.vim/undo_files//
 " Automatically re-read files changed outside
 set autoread
 set copyindent
-set undolevels=1000
+set undolevels=100
 
 " you have a fast terminal
-" set ttyfast
+set ttyfast
 " set ttyscroll=3
 
 set completeopt-=preview  " Do not show preview window for ins-completion.
